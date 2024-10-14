@@ -16,10 +16,13 @@ import java.util.function.Function;
 @Service
 public class JwtService {
     private static final String SECRET_KEY="skiBT16JJbsOLQvVEnCnXzXc1NSUUv9MUgIwK/b1D9q/BsppV0hc2niia7n/GncK";
-    public String extractUserEmail(String token) {
+    public String extractUserName(String token) {
         return extractClaim(token,Claims::getSubject);
     }
+    public String generateToken( UserDetails userDetails){
+        return generateToken(null,userDetails);
 
+    }
     public String generateToken(Map<String,Object> extraClaims, UserDetails userDetails){
         return Jwts.builder()
                 .setClaims(extraClaims)
@@ -29,6 +32,19 @@ public class JwtService {
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256).compact();
 
     }
+    public boolean isTokenValid(String token, UserDetails userDetails){
+        final String userName = extractUserName(token);
+        return userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return extractClaim(token,Claims::getExpiration);
+    }
+
     private <T> T extractClaim(String token, Function<Claims,T> claimResolver){
         Claims claims = extractAllClaims(token);
         return claimResolver.apply(claims);
