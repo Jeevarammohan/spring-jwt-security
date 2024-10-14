@@ -25,7 +25,7 @@ public class SecurityConfiguration{
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF if not needed
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/**").permitAll() // Allow public URLs
+                        .requestMatchers("/api/v1/auth/**").permitAll() // Allow public URLs
                         .anyRequest().authenticated() // Any other request must be authenticated
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
